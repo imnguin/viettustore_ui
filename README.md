@@ -1,2 +1,0 @@
-- UI xây dựng bằng reactjs with create react app
-- Dùng node 21.7.3
