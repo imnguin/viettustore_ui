@@ -14,7 +14,7 @@ export const addProductColunms = [
                 message: 'không được để trống!',
             },
         ],
-        label: 'Nhập mã sản phẩm',
+        label: 'Mã sản phẩm',
         placeholder: 'Nhập mã sản phẩm',
         labelCol: 24, colSpan: 24
     }
