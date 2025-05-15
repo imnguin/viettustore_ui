@@ -1,0 +1,37 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # Thay 'main' bằng nhánh chính của bạn (có thể là 'master')
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout mã nguồn
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Cài đặt Node.js (phiên bản 21.7.3)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '21.7.3'
+          cache: 'yarn' # Bật cache cho Yarn
+
+      # Cài đặt dependencies với Yarn
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+
+      # Build dự án
+      - name: Build
+        run: yarn build
+
+      # Deploy lên GitHub Pages
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
