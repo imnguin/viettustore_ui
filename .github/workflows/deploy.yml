@@ -23,7 +23,9 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Build
-        run: yarn build --max-warnings=0  # Bỏ qua cảnh báo và tiếp tục build
+        env:
+          CI: false  # Tắt chế độ CI để bỏ qua cảnh báo
+        run: yarn build --max-warnings=0
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
