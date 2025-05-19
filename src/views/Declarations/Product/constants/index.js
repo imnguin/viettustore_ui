@@ -115,3 +115,55 @@ export const ElementList = [
         label: 'Hệ thống',
     },
 ]
+
+export const fileTempalteData = {
+    data: [
+        ['Mã sản phẩm', 'Tên sản phẩm', 'Đơn vị tính', 'Nhà sản xuất', 'Thương hiệu', 'Mô tả', 'Kích hoạt', 'Hệ thống'],
+        ['SP001', 'Sản phẩm 1', 1, 1, 1, 'Mô tả', true, false],
+        ['SP002', 'Sản phẩm 2', 1, 2, 2, 'Mô tả', true, false],
+        ['SP003', 'Sản phẩm 3', 1, 3, 3, 'Mô tả', true, false],
+    ],
+};
+
+export const schema = {
+    "Mã sản phẩm": {
+        prop: 'productid',
+        type: String,
+        required: true
+    },
+    "Tên sản phẩm": {
+        prop: 'productname',
+        type: String,
+        required: true
+    },
+    "Đơn vị tính": {
+        prop: 'quantityunitid',
+        type: Number,
+        required: true
+    },
+    "Nhà sản xuất": {
+        prop: 'brandid',
+        type: Number,
+        required: true
+    },
+    "Thương hiệu": {
+        prop: 'branchid',
+        type: Number,
+        required: true
+    },
+    "Mô tả": {
+        prop: 'description',
+        type: String,
+        required: false
+    },
+    "Kích hoạt": {
+        prop: 'isactivate',
+        type: Boolean,
+        required: false
+    },
+    "Hệ thống": {
+        prop: 'issystem',
+        type: Boolean,
+        required: false
+    }
+};

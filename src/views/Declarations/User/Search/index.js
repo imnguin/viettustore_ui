@@ -4,7 +4,7 @@ import { setBreadcrumb } from '../../../../components/Redux/Reducers';
 import { PagePath, SearchElement, columns } from '../constants';
 import DataGird from '../../../../components/DataGird';
 import { _fetchData } from '../../../../utils/CallAPI';
-import { HOSTNAME } from '../../../../utils/constants/SystemVars';
+import { HOSTNAME } from '../../../../utils/constants/systemVars';
 import { Notification } from '../../../../utils/Notification';
 import SearchForm from '../../../../components/SearchForm';
 

@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { setBreadcrumb } from '../../../../components/Redux/Reducers';
 import { PagePath, addProductColunms, columns } from '../constants';
 import { _fetchData } from '../../../../utils/CallAPI';
-import { HOSTNAME } from '../../../../utils/constants/SystemVars';
+import { HOSTNAME } from '../../../../utils/constants/systemVars';
 import { Notification } from '../../../../utils/Notification';
 import { Row, Col, Card, Table, Button, Input, Form, Typography, message, Select, Tooltip, Modal } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';

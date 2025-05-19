@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setBreadcrumb } from '../../../../components/Redux/Reducers';
-import { ElementList, PagePath, SearchElement, columns } from '../constants';
+import { ElementList, PagePath, SearchElement, columns, fileTempalteData, schema } from '../constants';
 import DataGird from '../../../../components/DataGird';
 import { _fetchData } from '../../../../utils/CallAPI';
-import { HOSTNAME } from '../../../../utils/constants/SystemVars';
+import { HOSTNAME } from '../../../../utils/constants/systemVars';
 import { Notification } from '../../../../utils/Notification';
 import SearchForm from '../../../../components/SearchForm';
 
@@ -77,6 +77,11 @@ const Search = (props) => {
                     apiUpdate='api/product/update'
                     apiDelete='api/product/delete'
                     onSelectRowItem={(values) => onSubmit({})}
+                    isExportTemplate={true}
+                    fileTempalteData={fileTempalteData}
+                    isImportExcel={true}
+                    schema={schema}
+                    apiImportExcel='api/product/add'
                 />
             }
         </>

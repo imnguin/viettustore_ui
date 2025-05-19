@@ -7,6 +7,8 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Notification } from "../../utils/Notification";
 import { useDispatch } from "react-redux";
 import { _fetchData } from "../../utils/CallAPI";
+import ExcelExport from "../ExcelExport";
+import ImportExcel from "../ExcelImport";
 
 const DataGird = (props) => {
     let {
@@ -36,7 +38,17 @@ const DataGird = (props) => {
         apiAdd,
         apiUpdate,
         apiDelete,
-        hostName
+        hostName,
+        isExportTemplate,
+        fileTemplateName,
+        fileTempalteData,
+        isImportExcel,
+        onImportExcel,
+        apiImportExcel,
+        schema,
+        checkFile,
+        rules,
+        isExportExcel,
     } = props;
 
     const [modal, contextHolder] = Modal.useModal();
@@ -292,10 +304,35 @@ const DataGird = (props) => {
         });
     };
 
+    const handleImportExcel = async (data) => {
+        if (apiImportExcel && hostName) {
+            const response = await dispatch(_fetchData(hostName, apiImportExcel, data));
+            Notification('Thông báo', response.message, response.iserror ? 'error' : 'success');
+            if (!response.iserror) {
+                onImportExcel?.(data)
+                return
+            }
+        }
+        onImportExcel?.(data)
+    }
+
     return (
         <>{!!title ? <Divider>{title}</Divider> : ""}
             {
-                !!isShowHeaderAction && <Row type='flex' justify={'end'} align='middle' style={{ marginBottom: 5, }}>
+                !!isShowHeaderAction && <Row type='flex' justify={'end'} align='middle' style={{ marginBottom: 5, gap: 5 }}>
+                    {!!isExportTemplate && <ExcelExport
+                        title='Xuất file mẫu'
+                        name={fileTemplateName || 'File mẫu'}
+                        sheets={[fileTempalteData || []]}
+                    />}
+
+                    {!!isImportExcel && <ImportExcel
+                        schema={schema}
+                        check={checkFile}
+                        rules={rules}
+                        call={handleImportExcel}
+                    />}
+
                     {!!isShowButtonAdd && <Button
                         onClick={() => handleAdd(2)}
                         size='middle'
@@ -313,7 +350,6 @@ const DataGird = (props) => {
                         htmlType='button'
                         disabled={disBtnDel}
                         loading={loadings[1]}
-                        style={{ marginLeft: 5 }}
                     >
                         <DeleteOutlined />Xóa
                     </Button>}

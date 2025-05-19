@@ -16,7 +16,7 @@ import {
 import { App, Button, ConfigProvider, Space, theme } from 'antd';
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { HOSTNAME } from '../../utils/constants/SystemVars';
+import { HOSTNAME } from '../../utils/constants/systemVars';
 import { _fetchLogin } from '../../utils/CallAPI';
 
 const ThemedLogin = ({ isDark, toggleDark }) => {

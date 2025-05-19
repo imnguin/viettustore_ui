@@ -4,7 +4,7 @@ import { setBreadcrumb } from "../../../../components/Redux/Reducers";
 import { AddElementList, EditPagePath } from "../constants";
 import FormContainer from "../../../../components/FormContainer";
 import { _fetchData } from "../../../../utils/CallAPI";
-import { HOSTNAME } from "../../../../utils/constants/SystemVars";
+import { HOSTNAME } from "../../../../utils/constants/systemVars";
 import { Notification } from "../../../../utils/Notification";
 import { useNavigate, useParams } from "react-router-dom";
 

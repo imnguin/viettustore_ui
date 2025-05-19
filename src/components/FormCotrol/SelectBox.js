@@ -1,6 +1,6 @@
 import { Col, Form, Select } from "antd";
 import { useEffect, useState } from "react";
-import { HOSTNAME } from "../../utils/constants/SystemVars";
+import { HOSTNAME } from "../../utils/constants/systemVars";
 import { _fetchData } from "../../utils/CallAPI";
 import { useDispatch } from "react-redux";
 

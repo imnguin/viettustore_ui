@@ -120,9 +120,9 @@ const ImportExcel = (props) => {
     }
 
     return (
-        <Tooltip title='Upload file excel' placement='top'>
+        <Tooltip title='Thêm file' placement='top'>
             <Button size='middle' htmlType='button' onClick={onClick}>
-                <UploadOutlined />
+                <UploadOutlined /> Thêm file
             </Button>
             <input type="file" id="imPortFile" hidden />
             {contextHolder}

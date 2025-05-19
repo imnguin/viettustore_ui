@@ -4,7 +4,7 @@ import { DownloadOutlined } from '@ant-design/icons';
 import { Button, Tooltip } from 'antd';
 
 const ExcelExport = (props) => {
-    const { sheets = [], name } = props;
+    const { sheets = [], name, title, placement } = props;
     const exportFile = () => {
         if (!sheets.length) {
             console.error("No sheets provided for export.");
@@ -20,9 +20,9 @@ const ExcelExport = (props) => {
     }
 
     return (
-        <Tooltip title="Export file excel" placement="top">
+        <Tooltip title={title} placement={placement || 'top'}>
             <Button onClick={exportFile} size='middle' htmlType='button'>
-                <DownloadOutlined />
+                <DownloadOutlined /> {title}
             </Button>
         </Tooltip>
     );
