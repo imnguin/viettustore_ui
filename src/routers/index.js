@@ -10,7 +10,6 @@ const Router = (props) => {
             <Routes>
                 <Route path='/login' element={<Login/>}></Route>
                 <Route path='*' element={<PrivateRoute><UI/></PrivateRoute>}></Route>
-                <Route path='*' element={<UI/>}></Route>
             </Routes>
         </>
     );
