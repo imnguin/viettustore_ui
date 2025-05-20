@@ -8,6 +8,7 @@ import { Notification } from '../../../../utils/Notification';
 import { Row, Col, Card, Table, Button, Input, Form, Typography, Modal, Select, Tooltip } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import FormContainer from '../../../../components/FormContainer';
+import ColumnGroup from 'antd/es/table/ColumnGroup';
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -22,8 +23,7 @@ const Search = () => {
     const dispatch = useDispatch();
     const [cart, setCart] = useState([]);
     const [discountCode, setDiscountCode] = useState('');
-    const [discountAmount, setDiscountAmount] = useState(0);
-    const [paymentMethod, setPaymentMethod] = useState('Tiền mặt');
+    const [paymentMethod, setPaymentMethod] = useState('1');
     const [barcode, setBarcode] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -34,7 +34,7 @@ const Search = () => {
     // Tính tổng số lượng và tổng tiền
     const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
     const totalPriceBeforeDiscount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const totalPrice = totalPriceBeforeDiscount - discountAmount;
+    const totalPrice = cart.reduce((sum, item) => sum + item.total, 0);
 
     // Hàm loadData chung cho cả quét barcode và submit form
     const loadData = async (postData) => {
@@ -50,13 +50,18 @@ const Search = () => {
                 const index = prev.findIndex((item) => item.productid === response.resultObject.productid);
                 if (index !== -1) {
                     const updatedCart = [...prev];
-                    updatedCart[index] = {
+                    let itemUpdate = {
                         ...updatedCart[index],
-                        quantity: updatedCart[index].quantity + 1,
+                        quantity: updatedCart[index].quantity + 1
                     };
+                    itemUpdate.total = discountValue(itemUpdate);
+                    updatedCart[index] = itemUpdate;
                     return updatedCart;
                 }
-                return [...prev, { ...response.resultObject, quantity: 1, discount: 0 }];
+
+                let itemUpdate = { ...response.resultObject, quantity: 1, discount: 0 };
+                itemUpdate.total = discountValue(itemUpdate);
+                return [...prev, itemUpdate];
             });
         } else {
             Notification('Thông báo', response.message, 'error');
@@ -114,21 +119,46 @@ const Search = () => {
         return /^\d*\.?\d*$/.test(input) && input !== '' && !isNaN(Number(input));
     };
 
-    const handleChangeDiscount = (productid, value) => {
+    const getNumberFromPercent = (input) => {
+        if (typeof input !== 'string' || !input.endsWith('%')) return null;
+        const numberPart = input.slice(0, -1); // Loại bỏ %
+        return /^\d*\.?\d*$/.test(numberPart) ? Number(numberPart) : null;
+    };
+
+    const discountValue = (record) => {
+        let total = record.price * record.quantity;
+        if (typeof record.discount === 'string' && record.discount.endsWith('%')) {
+            const percent = getNumberFromPercent(record.discount);
+            if (percent !== null) {
+                total = total - (percent / 100) * total; // Giảm theo phần trăm
+            }
+        } else if (!isNaN(Number(record.discount))) {
+            total = total - Number(record.discount); // Giảm theo số tiền cố định
+        }
+        return total;
+    }
+
+    const handleApplyDiscount = (productid, value) => {
+        console.log(productid, value)
         if (isValidValue(value) || !value) {
+            if (!!productid) {
+                const data = cart.map((item, index) => {
+                    if (item.productid === productid) {
+                        item.discount = value;
+                        item.total = discountValue(item);
+                    }
+                    return item;
+                })
+                setCart(data);
+                return
+            }
             const data = cart.map((item, index) => {
-                if (item.productid === productid) {
-                    item.discount = value;
-                    if (value.endsWith('%')) {
-                        item.total = ((item.price * item.quantity) * parseInt(value.split('%')[0])) / 100
-                    }
-                    else {
-                        item.total = (item.price * item.quantity) - parseInt(value)
-                    }
-                }
+                item.discount = value;
+                item.total = discountValue(item);
                 return item;
             })
             setCart(data);
+            Notification('Thông báo', `Áp dụng mã ${discountCode} thành công!`, 'success');
             return
         }
         Notification('Thông báo', 'Giá trị giảm giá không hợp lệ', 'error');
@@ -149,24 +179,24 @@ const Search = () => {
         Notification('Thông báo', 'Đã xóa sản phẩm khỏi giỏ hàng', 'success');
     };
 
-    // Áp dụng mã giảm giá
-    const handleApplyDiscount = () => {
-        if (!discountCode) {
-            Notification('Thông báo', 'Vui lòng nhập mã giảm giá', 'error');
-            return;
-        }
-        if (discountCode === 'DISCOUNT10') {
-            const discount = totalPriceBeforeDiscount * 0.1;
-            setDiscountAmount(discount);
-            Notification('Thông báo', `Áp dụng mã ${discountCode} thành công! Giảm ${discount.toLocaleString()} VNĐ`, 'success');
-        } else {
-            setDiscountAmount(0);
-            Notification('Thông báo', 'Mã giảm giá không hợp lệ', 'error');
-        }
-    };
-
     // Gửi yêu cầu in hóa đơn
     const handleCheckout = async () => {
+        const postData = cart.map((item, index) => {
+            return {
+                productid: item.productid,
+                productname: item.productname,
+                quantityunitid: item.quantityunitid,
+                quantityunitname: item.quantityunitname,
+                barcode: item.barcode,
+                price: item.price,
+                quantity: item.quantity,
+                totalamount: item.total,
+                paymentmethod: paymentMethod,
+                discountamount: discountValue(item),
+                discounttype: !getNumberFromPercent(item.discount) ? '1' : '2', //1: tiền ; 2: phần trắm
+            }
+        })
+        console.log('postData', postData)
         // Thêm logic thanh toán nếu cần
     };
 
@@ -200,14 +230,14 @@ const Search = () => {
                     >
                         <Row type="flex" justify="end" align="middle" style={{ marginBottom: 5 }}>
                             <Tooltip title="Nhạp mã barcode">
-                                <Button size="small" htmlType="button" icon={<PlusOutlined />} onClick={handleAddToCart}>
+                                <Button size="medium" htmlType="button" icon={<PlusOutlined />} onClick={handleAddToCart}>
                                     Nhập mã barcode
                                 </Button>
                             </Tooltip>
                         </Row>
                         <Table
                             size="small"
-                            columns={columns(handleQuantityChange, handleRemoveItem, handleChangeDiscount)}
+                            columns={columns(handleQuantityChange, handleRemoveItem, handleApplyDiscount)}
                             dataSource={cart}
                             rowKey="_id"
                             pagination={false}
@@ -226,19 +256,19 @@ const Search = () => {
                         <Form layout="vertical">
                             <Row gutter={[16, 16]}>
                                 <Col xs={24} sm={24}>
-                                    <Form.Item label="Mã Giảm Giá" style={{ margin: 0 }}>
+                                    <Form.Item label="Nhập giảm giá" style={{ margin: 0 }}>
                                         <Row gutter={[8, 0]} style={{ width: '100%' }}>
-                                            <Col xs={16} sm={18}>
+                                            <Col xs={14} sm={14}>
                                                 <Input
                                                     value={discountCode}
                                                     onChange={(e) => setDiscountCode(e.target.value)}
-                                                    placeholder="Nhập mã giảm giá"
+                                                    placeholder="Số tiền hoặc phần trăm"
                                                     style={{ width: '100%' }}
                                                 />
                                             </Col>
-                                            <Col xs={8} sm={6}>
-                                                <Button type="primary" onClick={handleApplyDiscount} block style={{ width: '100%' }}>
-                                                    Áp dụng
+                                            <Col xs={10} sm={10}>
+                                                <Button type="primary" onClick={() => handleApplyDiscount(null, discountCode)} block style={{ width: '100%' }}>
+                                                    Áp dụng tất cả
                                                 </Button>
                                             </Col>
                                         </Row>
@@ -259,14 +289,14 @@ const Search = () => {
                             </Row>
                             <div style={{ marginTop: '24px' }}>
                                 <Text strong>Tổng tiền hàng {`(${totalQuantity} sản phẩm)`}: </Text>
-                                <Text>{totalPriceBeforeDiscount.toLocaleString()} VNĐ</Text>
+                                <Text>{totalPriceBeforeDiscount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Text>
                                 <br />
                                 <Text strong>Giảm Giá: </Text>
-                                <Text type="success">{discountAmount.toLocaleString()} VNĐ</Text>
+                                <Text type="success">{(totalPriceBeforeDiscount - totalPrice).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Text>
                                 <br />
                                 <Text strong>Khách phải trả: </Text>
                                 <Text type="danger" style={{ fontSize: '18px' }}>
-                                    {totalPrice.toLocaleString()} VNĐ
+                                    {totalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                                 </Text>
                             </div>
                             <Row gutter={[8, 8]} style={{ marginTop: '24px', display: 'flex', justifyContent: 'center' }}>
@@ -277,7 +307,7 @@ const Search = () => {
                                         onClick={handleCheckout}
                                         block
                                         style={{ width: '100%', borderRadius: '4px' }}
-                                        disabled={loading}
+                                        disabled={loading || !cart || cart.length == 0}
                                     >
                                         Thanh Toán
                                     </Button>
@@ -288,13 +318,12 @@ const Search = () => {
                                         onClick={() => {
                                             setCart([]);
                                             setDiscountCode('');
-                                            setDiscountAmount(0);
-                                            setPaymentMethod('Tiền mặt');
+                                            setPaymentMethod('1');
                                             Notification('Thông báo', 'Đã hủy thanh toán', 'info');
                                         }}
                                         block
                                         style={{ width: '100%', borderRadius: '4px' }}
-                                        disabled={loading}
+                                        disabled={loading || !cart || cart.length == 0}
                                     >
                                         Hủy
                                     </Button>

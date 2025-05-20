@@ -20,7 +20,7 @@ export const addProductColunms = [
     }
 ];
 
-export const columns = (handleQuantityChange, handleRemoveItem, handleChangeDiscount) => {
+export const columns = (handleQuantityChange, handleRemoveItem, handleApplyDiscount) => {
     return [
         {
             title: 'STT',
@@ -55,7 +55,7 @@ export const columns = (handleQuantityChange, handleRemoveItem, handleChangeDisc
             dataIndex: 'price',
             key: 'price',
             align: 'center',
-            render: (price) => price.toLocaleString(),
+            render: (price) => price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
         },
         {
             title: 'SL',
@@ -72,24 +72,35 @@ export const columns = (handleQuantityChange, handleRemoveItem, handleChangeDisc
                 />
             ),
         },
-        // {
-        //     title: 'Giảm',
-        //     dataIndex: 'discount',
-        //     key: 'discount',
-        //     align: 'center',
-        //     render: (discount, record) => (
-        //         <Input
-        //             value={discount}
-        //             onChange={(e) => handleChangeDiscount(record.productid, e.target.value)}
-        //             style={{ width: '80px' }}
-        //         />
-        //     ),
-        // },
+        {
+            title: 'Giảm giá',
+            dataIndex: 'discount',
+            key: 'discount',
+            align: 'center',
+            render: (discount, record) => (
+                <Input
+                    value={discount}
+                    onChange={(e) => handleApplyDiscount(record.productid, e.target.value)}
+                    style={{ width: '80px' }}
+                />
+            ),
+        },
         {
             title: 'Thành tiền',
             key: 'total',
             align: 'center',
-            render: (_, record) => (record.price * record.quantity).toLocaleString(),
+            render: (_, record) => {
+                // record.total = record.price * record.quantity; // Giá trị mặc định
+                // if (typeof record.discount === 'string' && record.discount.endsWith('%')) {
+                //     const percent = getNumberFromPercent(record.discount);
+                //     if (percent !== null) {
+                //         record.total = record.total - (percent / 100) * record.total; // Giảm theo phần trăm
+                //     }
+                // } else if (!isNaN(Number(record.discount))) {
+                //     record.total = record.total - Number(record.discount); // Giảm theo số tiền cố định
+                // }
+                return record.total.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+            },
         },
         {
             title: '',
