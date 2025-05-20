@@ -8,11 +8,14 @@ const UI = (props) => {
         <React.Suspense fallback={<div>Đang tải dữ liệu... </div>}>
             <Routes>
                 {
-                    configRoute.map(({ component: Component, path, layout, breadcrumb }) => (
-                        <Route path={path} key={path} element={Component ? <Layout layout={!!layout ? layout : 'Nguin'}><Component /></Layout> : <Navigate to={'/'} replace={true} />} />
-                    ))
+                    configRoute.map(({ component: Component, path, layout, breadcrumb }, index) => {
+                        console.error({ path, Component });
+                        return (
+                            <Route path={path} key={path} element={Component ? <Layout layout={!!layout ? layout : 'Nguin'}><Component /></Layout> : <Navigate to={'/'} replace={true} />} />
+                        )
+                    })
                 }
-            </Routes> 
+            </Routes>
         </React.Suspense>
     );
 }
