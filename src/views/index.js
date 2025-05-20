@@ -53,18 +53,36 @@ const AppMenu = [
                 path: '/Product',
                 subItem: []
             },
+            {
+                name: 'Price',
+                label: 'Giá sản phẩm',
+                path: '/Price',
+                subItem: []
+            },
+            {
+                name: 'Barcode',
+                label: 'Barcode',
+                path: '/Barcode',
+                subItem: []
+            },
         ]
     },
     {
-        name: 'Major',
+        name: 'InvoiceMenu',
         icon: OrderedListOutlined,
-        label: 'Nghiệp vụ',
+        label: 'Hóa đơn',
         path: '',
         subItem: [
             {
                 name: 'Invoice',
-                label: 'Hóa đơn',
+                label: 'Tạo mới',
                 path: '/Invoice',
+                subItem: []
+            },
+            {
+                name: 'History',
+                label: 'Lịch sử',
+                path: '/History',
                 subItem: []
             },
         ]

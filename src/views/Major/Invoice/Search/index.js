@@ -5,24 +5,27 @@ import { PagePath, addProductColunms, columns } from '../constants';
 import { _fetchData } from '../../../../utils/CallAPI';
 import { HOSTNAME } from '../../../../utils/constants/systemVars';
 import { Notification } from '../../../../utils/Notification';
-import { Row, Col, Card, Table, Button, Input, Form, Typography, message, Select, Tooltip, Modal } from 'antd';
+import { Row, Col, Card, Table, Button, Input, Form, Typography, Modal, Select, Tooltip } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import FormContainer from '../../../../components/FormContainer';
+
 const { Option } = Select;
 const { Text } = Typography;
 
-const Search = (props) => {
+const Search = () => {
     const [modal, contextHolder] = Modal.useModal();
     let objjd = null;
     const onCloseModal = () => {
         objjd.destroy();
-    }
-    
+    };
+
     const dispatch = useDispatch();
     const [cart, setCart] = useState([]);
     const [discountCode, setDiscountCode] = useState('');
     const [discountAmount, setDiscountAmount] = useState(0);
     const [paymentMethod, setPaymentMethod] = useState('Tiền mặt');
+    const [barcode, setBarcode] = useState('');
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         dispatch(setBreadcrumb(PagePath));
@@ -33,28 +36,102 @@ const Search = (props) => {
     const totalPriceBeforeDiscount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const totalPrice = totalPriceBeforeDiscount - discountAmount;
 
+    // Hàm loadData chung cho cả quét barcode và submit form
     const loadData = async (postData) => {
+        setLoading(true);
         const response = await dispatch(_fetchData(HOSTNAME, 'api/product/load', postData));
         if (!response.iserror) {
             if (!response.resultObject) {
                 Notification('Thông báo', 'Không tìm thấy sản phẩm!', 'error');
+                setLoading(false);
                 return;
             }
-            setCart(pre => {
-                const index = pre.findIndex(item => item.productid === response.resultObject.productid);
+            setCart((prev) => {
+                const index = prev.findIndex((item) => item.productid === response.resultObject.productid);
                 if (index !== -1) {
-                    const updatedCart = [...pre];
+                    const updatedCart = [...prev];
                     updatedCart[index] = {
                         ...updatedCart[index],
-                        quantity: updatedCart[index].quantity + 1
+                        quantity: updatedCart[index].quantity + 1,
                     };
                     return updatedCart;
                 }
-                return [...pre, { ...response.resultObject, quantity: 1, price: 5000 }];
+                return [...prev, { ...response.resultObject, quantity: 1, discount: 0 }];
             });
-            return;
+        } else {
+            Notification('Thông báo', response.message, 'error');
         }
-        Notification('Thông báo', response.message, 'error');
+        setLoading(false);
+    };
+
+    // Xử lý quét barcode
+    useEffect(() => {
+        let buffer = '';
+        let lastKeyTime = Date.now();
+
+        const handleKeyDown = (event) => {
+            if (loading) return; // Ngăn quét mới khi đang xử lý
+
+            const currentTime = Date.now();
+            if (currentTime - lastKeyTime > 50) {
+                buffer = '';
+            }
+            lastKeyTime = currentTime;
+
+            if (event.key?.length === 1) {
+                buffer += event.key;
+            }
+
+            if (event.key === 'Enter' && buffer) {
+                setBarcode(buffer);
+                buffer = '';
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [loading]);
+
+    // Gọi API khi barcode thay đổi
+    useEffect(() => {
+        if (barcode) {
+            loadData({ barcode });
+            setBarcode(''); // Reset barcode sau khi gọi API
+        }
+    }, [barcode]);
+
+    const isValidValue = (input) => {
+        if (typeof input !== 'string') return false;
+
+        // Kiểm tra nếu kết thúc bằng %
+        if (input.endsWith('%')) {
+            // Loại bỏ % và kiểm tra phần còn lại là số
+            const numberPart = input.slice(0, -1);
+            return /^\d*\.?\d*$/.test(numberPart) && numberPart !== '' && !isNaN(Number(numberPart));
+        }
+
+        // Kiểm tra nếu là số (số nguyên hoặc thập phân)
+        return /^\d*\.?\d*$/.test(input) && input !== '' && !isNaN(Number(input));
+    };
+
+    const handleChangeDiscount = (productid, value) => {
+        if (isValidValue(value) || !value) {
+            const data = cart.map((item, index) => {
+                if (item.productid === productid) {
+                    item.discount = value;
+                    if (value.endsWith('%')) {
+                        item.total = ((item.price * item.quantity) * parseInt(value.split('%')[0])) / 100
+                    }
+                    else {
+                        item.total = (item.price * item.quantity) - parseInt(value)
+                    }
+                }
+                return item;
+            })
+            setCart(data);
+            return
+        }
+        Notification('Thông báo', 'Giá trị giảm giá không hợp lệ', 'error');
     }
 
     // Cập nhật số lượng sản phẩm
@@ -63,12 +140,7 @@ const Search = (props) => {
             Notification('Thông báo', 'Số lượng phải lớn hơn 0', 'error');
             return;
         }
-
-        setCart(
-            cart.map((item) =>
-                item.productid === productid ? { ...item, quantity: value } : item
-            )
-        );
+        setCart(cart.map((item) => (item.productid === productid ? { ...item, quantity: value } : item)));
     };
 
     // Xóa sản phẩm khỏi giỏ hàng
@@ -83,7 +155,6 @@ const Search = (props) => {
             Notification('Thông báo', 'Vui lòng nhập mã giảm giá', 'error');
             return;
         }
-        // Giả định mã DISCOUNT10 giảm 10%
         if (discountCode === 'DISCOUNT10') {
             const discount = totalPriceBeforeDiscount * 0.1;
             setDiscountAmount(discount);
@@ -95,27 +166,29 @@ const Search = (props) => {
     };
 
     // Gửi yêu cầu in hóa đơn
-    const handleCheckout = async () => { };
+    const handleCheckout = async () => {
+        // Thêm logic thanh toán nếu cần
+    };
 
+    // Thêm sản phẩm qua modal
     const handleAddToCart = () => {
         const config = {
             icon: null,
             closable: false,
-            className: "modal-ant-custom",
+            className: 'modal-ant-custom',
             width: 300,
             footer: null,
             content: (
                 <FormContainer
-                    layout='vertical'
+                    layout="vertical"
                     listColumn={addProductColunms}
                     onCloseModal={onCloseModal}
-                    onSubmit={(values) => loadData(values)}
+                    onSubmit={(values) => loadData(values)} // Sử dụng loadData cho submit
                 />
-            )
+            ),
         };
-
         objjd = modal.confirm(config);
-    }
+    };
 
     return (
         <>
@@ -125,26 +198,22 @@ const Search = (props) => {
                         title="Danh sách sản phẩm"
                         style={{ borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                     >
-                        <Row type='flex' justify={'end'} align='middle' style={{ marginBottom: 5, }}>
-                            <Tooltip title="Thêm sản phẩm">
-                                <Button
-                                    size='small'
-                                    htmlType='button'
-                                    icon={<PlusOutlined />}
-                                    onClick={handleAddToCart}
-                                >
-                                    Thêm
+                        <Row type="flex" justify="end" align="middle" style={{ marginBottom: 5 }}>
+                            <Tooltip title="Nhạp mã barcode">
+                                <Button size="small" htmlType="button" icon={<PlusOutlined />} onClick={handleAddToCart}>
+                                    Nhập mã barcode
                                 </Button>
                             </Tooltip>
                         </Row>
                         <Table
                             size="small"
-                            columns={columns(handleQuantityChange, handleRemoveItem)}
+                            columns={columns(handleQuantityChange, handleRemoveItem, handleChangeDiscount)}
                             dataSource={cart}
                             rowKey="_id"
                             pagination={false}
                             bordered
                             scroll={{ x: true }}
+                            loading={loading}
                         />
                     </Card>
                 </Col>
@@ -182,9 +251,8 @@ const Search = (props) => {
                                             onChange={(value) => setPaymentMethod(value)}
                                             style={{ width: '100%' }}
                                         >
-                                            <Option value="Tiền mặt">Tiền mặt</Option>
-                                            <Option value="Thẻ tín dụng">Thẻ tín dụng</Option>
-                                            <Option value="Chuyển khoản">Chuyển khoản</Option>
+                                            <Option value="1">Tiền mặt</Option>
+                                            <Option value="2">Chuyển khoản</Option>
                                         </Select>
                                     </Form.Item>
                                 </Col>
@@ -209,6 +277,7 @@ const Search = (props) => {
                                         onClick={handleCheckout}
                                         block
                                         style={{ width: '100%', borderRadius: '4px' }}
+                                        disabled={loading}
                                     >
                                         Thanh Toán
                                     </Button>
@@ -225,6 +294,7 @@ const Search = (props) => {
                                         }}
                                         block
                                         style={{ width: '100%', borderRadius: '4px' }}
+                                        disabled={loading}
                                     >
                                         Hủy
                                     </Button>
@@ -237,5 +307,6 @@ const Search = (props) => {
             {contextHolder}
         </>
     );
-}
+};
+
 export default Search;
