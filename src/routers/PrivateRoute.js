@@ -8,7 +8,7 @@ const PrivateRoute = ({children}) => {
 
     if((!data && !data?.accesstoken))
     {
-       return <Navigate to="/viettustore_ui/login" state={{ from: location }} replace />;
+       return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
     return children;
