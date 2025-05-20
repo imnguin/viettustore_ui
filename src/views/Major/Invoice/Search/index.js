@@ -14,6 +14,7 @@ const { Option } = Select;
 const { Text } = Typography;
 
 const Search = () => {
+    const user = JSON.parse(localStorage.getItem('logininfo'))
     const [modal, contextHolder] = Modal.useModal();
     let objjd = null;
     const onCloseModal = () => {
@@ -181,8 +182,10 @@ const Search = () => {
 
     // Gửi yêu cầu in hóa đơn
     const handleCheckout = async () => {
+        setLoading(true);
         const postData = cart.map((item, index) => {
             return {
+                createduser: user?.username,
                 productid: item.productid,
                 productname: item.productname,
                 quantityunitid: item.quantityunitid,
@@ -192,12 +195,22 @@ const Search = () => {
                 quantity: item.quantity,
                 totalamount: item.total,
                 paymentmethod: paymentMethod,
-                discountamount: discountValue(item),
+                discountamount: (item.price * item.quantity) - item.total,
                 discounttype: !getNumberFromPercent(item.discount) ? '1' : '2', //1: tiền ; 2: phần trắm
             }
         })
         console.log('postData', postData)
         // Thêm logic thanh toán nếu cần
+
+        const response = await dispatch(_fetchData(HOSTNAME, 'api/outputvoucher/add', postData));
+        Notification('Thông báo', response.message, response.iserror ? 'error' : 'success');
+        setLoading(false);
+        if (!response.iserror) {
+            setCart([]);
+            setDiscountCode('');
+            setPaymentMethod('1');
+            return
+        }
     };
 
     // Thêm sản phẩm qua modal
