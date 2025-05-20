@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/viettustore_ui/static/css/main.53faf77e.css",
-    "main.js": "/viettustore_ui/static/js/main.7a28aee3.js",
+    "main.js": "/viettustore_ui/static/js/main.aadf2abc.js",
     "static/js/453.431378eb.chunk.js": "/viettustore_ui/static/js/453.431378eb.chunk.js",
     "index.html": "/viettustore_ui/index.html",
     "main.53faf77e.css.map": "/viettustore_ui/static/css/main.53faf77e.css.map",
-    "main.7a28aee3.js.map": "/viettustore_ui/static/js/main.7a28aee3.js.map",
+    "main.aadf2abc.js.map": "/viettustore_ui/static/js/main.aadf2abc.js.map",
     "453.431378eb.chunk.js.map": "/viettustore_ui/static/js/453.431378eb.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.53faf77e.css",
-    "static/js/main.7a28aee3.js"
+    "static/js/main.aadf2abc.js"
   ]
 }
