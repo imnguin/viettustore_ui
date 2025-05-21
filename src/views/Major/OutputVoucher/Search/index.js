@@ -249,7 +249,7 @@ const Search = () => {
             <Row gutter={[16, 16]}>
                 <Col xs={24} lg={14} xl={16} xxl={18}>
                     <Card
-                        title="Danh sách sản phẩm"
+                        title="Danh sách sản phẩm (click vào vùng trống khi quét mã)"
                         style={{ borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                     >
                         <Row type="flex" justify="end" align="middle" style={{ marginBottom: 5 }}>
