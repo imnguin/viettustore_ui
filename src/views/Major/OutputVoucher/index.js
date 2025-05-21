@@ -8,11 +8,11 @@ const OutputVoucher = [
         component : Search
     },
     {
-        path : 'OutputVoucher/History',
+        path : '/History',
         component : History
     },
     {
-        path : 'OutputVoucher/Detail/:outputvoucherid',
+        path : '/OutputVoucher/Detail/:outputvoucherid',
         component : Detail
     },
 ]

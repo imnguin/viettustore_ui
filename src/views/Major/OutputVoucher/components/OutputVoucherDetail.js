@@ -9,7 +9,7 @@ const OutputVoucherDetail = (props) => {
         <DataGird
             isDisableRowSelect={true}
             listColumn={outputvoucherDetailColumns}
-            dataSource={dataSource}
+            dataSource={dataSource?.outputvoucherdetail}
             defaultCurrentPage={1}
             defaultPageSize={20}
             showHeader={true}

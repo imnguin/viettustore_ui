@@ -3,7 +3,14 @@ import { Button, Input, InputNumber, Typography } from "antd";
 import { DeleteOutlined, PlusOutlined, CloseOutlined } from '@ant-design/icons';
 import { Link } from "react-router-dom";
 import { render } from "@testing-library/react";
+import dayjs from "dayjs";
+const now = new Date();
 
+// Tạo fromDate là ngày 1 đầu tháng (giờ 00:00:00)
+const fromDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
+
+// Tạo toDate là hôm nay (giờ 23:59:59.999)
+const toDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
 export const PagePath = [{ href: "/", title: "Trang chủ" }, { title: "Hóa đơn bán hàng", }];
 
 export const addProductColunms = [
@@ -117,11 +124,13 @@ export const SearchElement = [
         type: 'DatePicker',
         label: 'Từ ngày',
         name: 'fromdate',
+        defaultValue: fromDate
     },
     {
         type: 'DatePicker',
         label: 'Đến ngày',
         name: 'todate',
+        defaultValue: toDate
     },
     // {
     //     type: 'SelectBox',
@@ -168,16 +177,22 @@ export const SearchElement = [
     // },
 ];
 
+export const InitParam = {
+    fromdate: fromDate,
+    todate: toDate
+}
+
 export const historyColumns = [
     {
         title: 'Mã hóa đơn',
         dataIndex: 'outputvoucherid',
         key: 'outputvoucherid',
         render: (key, item) => (
-            <Link key={key} to={`OutputVoucher/Detail/${item.outputvoucherid}`}>{item.outputvoucherid}</Link>
+            <Link key={key} to={`/OutputVoucher/Detail/${item.outputvoucherid}`}>{item.outputvoucherid}</Link>
         ),
         fixed: 'left',
         width: 100,
+        align: 'center',
     },
     {
         title: 'Tiền thu của khách',
@@ -187,6 +202,7 @@ export const historyColumns = [
             return totalamount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
         },
         width: 100,
+        align: 'center',
     },
     {
         title: 'Tiền giảm giá',
@@ -196,6 +212,7 @@ export const historyColumns = [
             return discountamount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
         },
         width: 100,
+        align: 'center',
     },
     {
         title: 'Ngày lập hóa đơn',
@@ -211,17 +228,11 @@ export const historyColumns = [
             });
         },
         width: 100,
+        align: 'center'
     }
 ];
 
 export const outputvoucherDetailColumns = [
-    {
-        title: 'STT',
-        dataIndex: 'index',
-        key: 'index',
-        align: 'center',
-        render: (_, __, index) => index + 1,
-    },
     {
         title: 'Sản phẩm',
         dataIndex: 'productid',
@@ -230,14 +241,14 @@ export const outputvoucherDetailColumns = [
             <>{item.productid} - {item.productname}</>
         ),
         align: 'center',
-        width: 100,
+        width: 150,
     },
     {
         title: 'Barcode',
         dataIndex: 'barcode',
         key: 'barcode',
         align: 'center',
-
+        width: 100,
     },
     {
         title: 'Đơn vị tính',
@@ -258,18 +269,23 @@ export const outputvoucherDetailColumns = [
         title: 'Số lượng',
         dataIndex: 'quantity',
         key: 'quantity',
-        width: 100,
+        width: 50,
         align: 'center',
     },
     {
         title: 'Giảm giá',
-        dataIndex: 'discount',
-        key: 'discount',
+        dataIndex: 'discountamount',
+        key: 'discountamount',
         align: 'center',
+        width: 100,
+        render: (discountamount) => discountamount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
     },
     {
         title: 'Thành tiền',
-        key: 'total',
+        key: 'totalamount',
+        dataIndex: 'totalamount',
         align: 'center',
+        width: 100,
+        render: (totalamount) => totalamount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
     },
 ]

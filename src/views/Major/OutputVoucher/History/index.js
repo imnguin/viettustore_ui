@@ -3,10 +3,12 @@ import { HOSTNAME } from "../../../../utils/constants/systemVars";
 import { _fetchData } from "../../../../utils/CallAPI";
 import { setBreadcrumb } from "../../../../components/Redux/Reducers";
 import { Notification } from "../../../../utils/Notification";
-import { historyColumns, PagePath, SearchElement } from "../constants";
+import { historyColumns, InitParam, PagePath, SearchElement } from "../constants";
 import SearchForm from "../../../../components/SearchForm";
 import { useDispatch } from "react-redux";
 import DataGird from "../../../../components/DataGird";
+import { toUTCFromLocal } from "../../../../utils";
+import dayjs from "dayjs";
 
 const History = () => {
     const dispatch = useDispatch();
@@ -15,31 +17,16 @@ const History = () => {
 
     useEffect(() => {
         dispatch(setBreadcrumb(PagePath));
-        loadData({});
+        loadData(InitParam);
     }, []);
-
     const onSubmit = (MLObject) => {
-        let postData = {};
-        let fromdate = MLObject?.fromdate ? new Date(MLObject?.fromdate) : new Date();
-        let todate = MLObject?.todate ? new Date(MLObject?.todate) : new Date();
-        fromdate.setHours(0, 0, 0, 0);
-        todate.setHours(23, 59, 59, 999);
-        if (!!MLObject?.keyword) {
-            postData = {
-                outputvoucherid: MLObject?.keyword, // Điều kiện outputvoucherid
-                createdat: {
-                    $gte: fromdate, // Từ ngày
-                    $lte: todate,   // Đến ngày
-                }
-            }
-        } else {
-            postData = {
-                createdat: {
-                    $gte: fromdate, // Từ ngày
-                    $lte: todate,   // Đến ngày
-                }
-            }
-        }
+        let fromdate = MLObject?.fromdate ? new Date(MLObject?.fromdate) : InitParam.fromdate
+        let todate = MLObject?.todate ? new Date(MLObject?.todate) : InitParam.todate;
+        let postData = {
+            outputvoucherid: MLObject?.keyword,
+            fromdate: toUTCFromLocal(fromdate),
+            todate: toUTCFromLocal(todate)
+        };
         loadData(postData);
     }
 
