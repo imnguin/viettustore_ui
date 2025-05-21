@@ -1,8 +1,9 @@
-import { Button, Col, DatePicker, Form, Input, Row, Grid } from 'antd';
+import { Button, Col, DatePicker, Form, Input, Row, Grid, Space, Select } from 'antd';
 import React, { useState } from "react";
 import { useEffect } from 'react';
 import SelectBox from '../SearchControl/SelectBox';
 import TextBox from '../SearchControl/TextBox';
+import dayjs from 'dayjs';
 const { useBreakpoint } = Grid;
 const SearchForm = (props) => {
     let {
@@ -10,7 +11,7 @@ const SearchForm = (props) => {
         listColumn,
         onSubmit
     } = props;
-    
+
     const [Items, setItems] = useState([]);
     const [form] = Form.useForm();
     const [IsShow, SetIsShow] = useState(false);
@@ -42,13 +43,18 @@ const SearchForm = (props) => {
         const children = listColumn?.map((item, index) => {
             switch (item.type) {
                 case 'SelectBox':
-                    return <SelectBox {...item} key={index} index={index}/>
+                    return <SelectBox {...item} key={index} index={index} />
                 case 'TextBox':
-                    return <TextBox {...item} key={index} index={index}/>
-                case 'date':
-                    return <Col key={index}>
+                    return <TextBox {...item} key={index} index={index} />
+                case 'DatePicker':
+                    return <Col xs={24} sm={6} lg={4} key={index}>
                         <Form.Item name={item.name} label={item.label} rules={item.rules}>
-                            <DatePicker placement={!!item.placement ? item.placement : 'topLeft'} />
+                            <DatePicker
+                                placement={!!item.placement ? item.placement : 'topLeft'}
+                                defaultValue={dayjs(item.defaultValue).isValid() ? dayjs(item.defaultValue) : dayjs(new Date())}
+                                format={item.format ? item.format : 'DD/MM/YYYY'}
+                                style={{ width: '100%' }}
+                            />
                         </Form.Item>
                     </Col>
                 default:

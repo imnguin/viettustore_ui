@@ -82,7 +82,7 @@ const AppMenu = [
             {
                 name: 'History',
                 label: 'Lịch sử',
-                path: '/History',
+                path: 'OutputVoucher/History',
                 subItem: []
             },
         ]

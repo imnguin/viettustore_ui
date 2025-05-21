@@ -1,3 +1,4 @@
+import Detail from './Detail';
 import History from './History';
 import Search from './Search'
 
@@ -7,8 +8,12 @@ const OutputVoucher = [
         component : Search
     },
     {
-        path : '/History',
+        path : 'OutputVoucher/History',
         component : History
+    },
+    {
+        path : 'OutputVoucher/Detail/:outputvoucherid',
+        component : Detail
     },
 ]
 export default OutputVoucher;

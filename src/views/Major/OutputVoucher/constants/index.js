@@ -1,6 +1,8 @@
 import React from "react";
 import { Button, Input, InputNumber, Typography } from "antd";
 import { DeleteOutlined, PlusOutlined, CloseOutlined } from '@ant-design/icons';
+import { Link } from "react-router-dom";
+import { render } from "@testing-library/react";
 
 export const PagePath = [{ href: "/", title: "Trang chủ" }, { title: "Hóa đơn bán hàng", }];
 
@@ -90,15 +92,6 @@ export const columns = (handleQuantityChange, handleRemoveItem, handleApplyDisco
             key: 'total',
             align: 'center',
             render: (_, record) => {
-                // record.total = record.price * record.quantity; // Giá trị mặc định
-                // if (typeof record.discount === 'string' && record.discount.endsWith('%')) {
-                //     const percent = getNumberFromPercent(record.discount);
-                //     if (percent !== null) {
-                //         record.total = record.total - (percent / 100) * record.total; // Giảm theo phần trăm
-                //     }
-                // } else if (!isNaN(Number(record.discount))) {
-                //     record.total = record.total - Number(record.discount); // Giảm theo số tiền cố định
-                // }
                 return record.total.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
             },
         },
@@ -112,3 +105,171 @@ export const columns = (handleQuantityChange, handleRemoveItem, handleApplyDisco
         },
     ]
 }
+
+export const SearchElement = [
+    {
+        type: 'TextBox',
+        label: 'Tìm kiếm',
+        name: 'keyword',
+        placeholder: 'Nhập mã hóa đơn'
+    },
+    {
+        type: 'DatePicker',
+        label: 'Từ ngày',
+        name: 'fromdate',
+    },
+    {
+        type: 'DatePicker',
+        label: 'Đến ngày',
+        name: 'todate',
+    },
+    // {
+    //     type: 'SelectBox',
+    //     label: 'Thanh toán',
+    //     name: 'paymentmethod',
+    //     listOption: [
+    //         {
+    //             label: 'Tiền mặt',
+    //             value: '1'
+    //         },
+    //         {
+    //             label: 'Chuyển khoản',
+    //             value: '2'
+    //         }
+    //     ],
+    //     maxTagCount: 'responsive',
+    // },
+    // {
+    //     type: 'SelectBox',
+    //     label: 'Giảm giá',
+    //     name: 'discounttype',
+    //     listOption: [
+    //         {
+    //             label: 'Theo tiền',
+    //             value: '1'
+    //         },
+    //         {
+    //             label: 'Theo phần trăm',
+    //             value: '2'
+    //         }
+    //     ],
+    //     maxTagCount: 'responsive',
+    // },
+    // {
+    //     type: 'SelectBox',
+    //     label: 'Đơn vị tính',
+    //     name: 'quantityunitid',
+    //     listOption: [],
+    //     maxTagCount: 'responsive',
+    //     isLoadData: true,
+    //     url: 'api/quantityunit/getCache',
+    //     elementValue: 'quantityunitid',
+    //     elementName: 'quantityunitname'
+    // },
+];
+
+export const historyColumns = [
+    {
+        title: 'Mã hóa đơn',
+        dataIndex: 'outputvoucherid',
+        key: 'outputvoucherid',
+        render: (key, item) => (
+            <Link key={key} to={`OutputVoucher/Detail/${item.outputvoucherid}`}>{item.outputvoucherid}</Link>
+        ),
+        fixed: 'left',
+        width: 100,
+    },
+    {
+        title: 'Tiền thu của khách',
+        dataIndex: 'totalamount',
+        key: 'totalamount',
+        render: (totalamount) => {
+            return totalamount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+        },
+        width: 100,
+    },
+    {
+        title: 'Tiền giảm giá',
+        dataIndex: 'discountamount',
+        key: 'discountamount',
+        render: (discountamount) => {
+            return discountamount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+        },
+        width: 100,
+    },
+    {
+        title: 'Ngày lập hóa đơn',
+        dataIndex: 'createdat',
+        key: 'createdat',
+        render: (createdat) => {
+            return new Date(createdat).toLocaleDateString('vi-VN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+            });
+        },
+        width: 100,
+    }
+];
+
+export const outputvoucherDetailColumns = [
+    {
+        title: 'STT',
+        dataIndex: 'index',
+        key: 'index',
+        align: 'center',
+        render: (_, __, index) => index + 1,
+    },
+    {
+        title: 'Sản phẩm',
+        dataIndex: 'productid',
+        key: 'productid',
+        render: (key, item) => (
+            <>{item.productid} - {item.productname}</>
+        ),
+        align: 'center',
+        width: 100,
+    },
+    {
+        title: 'Barcode',
+        dataIndex: 'barcode',
+        key: 'barcode',
+        align: 'center',
+
+    },
+    {
+        title: 'Đơn vị tính',
+        dataIndex: 'quantityunitname',
+        key: 'quantityunitname',
+        width: 100,
+        align: 'center',
+    },
+    {
+        title: 'Đơn giá',
+        dataIndex: 'price',
+        key: 'price',
+        render: (price) => price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
+        width: 100,
+        align: 'center',
+    },
+    {
+        title: 'Số lượng',
+        dataIndex: 'quantity',
+        key: 'quantity',
+        width: 100,
+        align: 'center',
+    },
+    {
+        title: 'Giảm giá',
+        dataIndex: 'discount',
+        key: 'discount',
+        align: 'center',
+    },
+    {
+        title: 'Thành tiền',
+        key: 'total',
+        align: 'center',
+    },
+]
