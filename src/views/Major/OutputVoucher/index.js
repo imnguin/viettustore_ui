@@ -1,9 +1,9 @@
 import History from './History';
 import Search from './Search'
 
-const Invoice = [
+const OutputVoucher = [
     {
-        path : '/Invoice',
+        path : '/OutputVoucher',
         component : Search
     },
     {
@@ -11,4 +11,4 @@ const Invoice = [
         component : History
     },
 ]
-export default Invoice;
+export default OutputVoucher;

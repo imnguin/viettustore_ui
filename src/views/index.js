@@ -68,15 +68,15 @@ const AppMenu = [
         ]
     },
     {
-        name: 'InvoiceMenu',
+        name: 'Invoice',
         icon: OrderedListOutlined,
         label: 'Hóa đơn',
         path: '',
         subItem: [
             {
-                name: 'Invoice',
+                name: 'OutputVoucher',
                 label: 'Tạo mới',
-                path: '/Invoice',
+                path: '/OutputVoucher',
                 subItem: []
             },
             {

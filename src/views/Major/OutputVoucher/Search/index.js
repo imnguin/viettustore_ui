@@ -52,7 +52,8 @@ const Search = () => {
                 if (index !== -1) {
                     const updatedCart = [...prev];
                     let itemUpdate = {
-                        ...updatedCart[index],
+                        ...response.resultObject,
+                        discount: updatedCart[index].discount,
                         quantity: updatedCart[index].quantity + 1
                     };
                     itemUpdate.total = discountValue(itemUpdate);
@@ -171,7 +172,17 @@ const Search = () => {
             Notification('Thông báo', 'Số lượng phải lớn hơn 0', 'error');
             return;
         }
-        setCart(cart.map((item) => (item.productid === productid ? { ...item, quantity: value } : item)));
+        if (!!productid) {
+            const data = cart.map((item, index) => {
+                if (item.productid === productid) {
+                    item.quantity = value;
+                    item.total = discountValue(item);
+                }
+                return item;
+            })
+            setCart(data);
+            return
+        }
     };
 
     // Xóa sản phẩm khỏi giỏ hàng
@@ -256,7 +267,6 @@ const Search = () => {
                             pagination={false}
                             bordered
                             scroll={{ x: true }}
-                            loading={loading}
                         />
                     </Card>
                 </Col>

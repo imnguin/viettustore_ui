@@ -68,7 +68,7 @@ export const columns = (handleQuantityChange, handleRemoveItem, handleApplyDisco
                     max={record.stock}
                     value={quantity}
                     onChange={(value) => handleQuantityChange(record.productid, value)}
-                    style={{ width: '40px' }}
+                    style={{ width: '60px' }}
                 />
             ),
         },
