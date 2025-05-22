@@ -75,7 +75,7 @@ const ThemedLogin = ({ isDark, toggleDark }) => {
             >
                 <LoginForm
                     logo="https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg"
-                    title="Tạp hóa Việt Tú"
+                    title="Bách hóa tổng hợp"
                     subTitle={
                         <div style={{ color: token.colorText }}>
                             Nền tảng quản lý hiện đại
