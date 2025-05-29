@@ -27,9 +27,41 @@ const Search = () => {
     const [paymentMethod, setPaymentMethod] = useState('1');
     const [barcode, setBarcode] = useState('');
     const [loading, setLoading] = useState(false);
+    const [weight, setWeight] = useState('0.00');
+    const [status, setStatus] = useState('Ngắt kết nối');
 
     useEffect(() => {
         dispatch(setBreadcrumb(PagePath));
+    }, []);
+
+    useEffect(() => {
+        // Kết nối với WebSocket server
+        const ws = new WebSocket('ws://localhost:8080');
+
+        ws.onopen = () => {
+            setStatus('Đã kết nối');
+            Notification('Thông báo', 'Kết nối WebSocket thành công', 'success');
+        };
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            setWeight(data.weight);
+        };
+
+        ws.onclose = () => {
+            setStatus('Ngắt kết nối');
+            Notification('Thông báo', 'Kết nối WebSocket đã bị ngắt', 'warning');
+        };
+
+        ws.onerror = (error) => {
+            Notification('Thông báo', 'Lỗi kết nối WebSocket', 'error');
+            setStatus('Lỗi');
+        };
+
+        // Dọn dẹp kết nối khi component unmount
+        return () => {
+            ws.close();
+        };
     }, []);
 
     // Tính tổng số lượng và tổng tiền
@@ -253,11 +285,27 @@ const Search = () => {
                         style={{ borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                     >
                         <Row type="flex" justify="end" align="middle" style={{ marginBottom: 5 }}>
-                            <Tooltip title="Nhạp mã barcode">
+                            {/* <Tooltip title="Nhạp mã barcode">
                                 <Button size="medium" htmlType="button" icon={<PlusOutlined />} onClick={handleAddToCart}>
                                     Nhập mã barcode
                                 </Button>
-                            </Tooltip>
+                            </Tooltip> */}
+                            <Form
+                                name='input-barcode'
+                                layout="inline"
+                                style={{ marginRight: 10 }}
+                                onFinish={(values) => { setBarcode(values.barcode) }}
+                            >
+                                <Form.Item name="barcode" style={{ marginBottom: 5 }}>
+                                    <Input
+                                        placeholder="Nhập mã barcode"
+                                        value={barcode}
+                                    />
+                                </Form.Item>
+                                <Form.Item style={{ marginBottom: 5 }}>
+                                    <Button type="primary" htmlType="submit">Tìm kiếm</Button>
+                                </Form.Item>
+                            </Form>
                         </Row>
                         <Table
                             size="small"
