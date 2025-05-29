@@ -34,35 +34,35 @@ const Search = () => {
         dispatch(setBreadcrumb(PagePath));
     }, []);
 
-    useEffect(() => {
-        // Kết nối với WebSocket server
-        const ws = new WebSocket('ws://localhost:8080');
+    // useEffect(() => {
+    //     // Kết nối với WebSocket server
+    //     const ws = new WebSocket('ws://localhost:8080');
 
-        ws.onopen = () => {
-            setStatus('Đã kết nối');
-            Notification('Thông báo', 'Kết nối WebSocket thành công', 'success');
-        };
+    //     ws.onopen = () => {
+    //         setStatus('Đã kết nối');
+    //         Notification('Thông báo', 'Kết nối WebSocket thành công', 'success');
+    //     };
 
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            setWeight(data.weight);
-        };
+    //     ws.onmessage = (event) => {
+    //         const data = JSON.parse(event.data);
+    //         setWeight(data.weight);
+    //     };
 
-        ws.onclose = () => {
-            setStatus('Ngắt kết nối');
-            Notification('Thông báo', 'Kết nối WebSocket đã bị ngắt', 'warning');
-        };
+    //     ws.onclose = () => {
+    //         setStatus('Ngắt kết nối');
+    //         Notification('Thông báo', 'Kết nối WebSocket đã bị ngắt', 'warning');
+    //     };
 
-        ws.onerror = (error) => {
-            Notification('Thông báo', 'Lỗi kết nối WebSocket', 'error');
-            setStatus('Lỗi');
-        };
+    //     ws.onerror = (error) => {
+    //         Notification('Thông báo', 'Lỗi kết nối WebSocket', 'error');
+    //         setStatus('Lỗi');
+    //     };
 
-        // Dọn dẹp kết nối khi component unmount
-        return () => {
-            ws.close();
-        };
-    }, []);
+    //     // Dọn dẹp kết nối khi component unmount
+    //     return () => {
+    //         ws.close();
+    //     };
+    // }, []);
 
     // Tính tổng số lượng và tổng tiền
     const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);

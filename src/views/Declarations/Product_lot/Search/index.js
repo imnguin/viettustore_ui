@@ -74,7 +74,7 @@ const Search = (props) => {
                     fileTempalteData={fileTempalteData}
                     isImportExcel={true}
                     schema={schema}
-                    apiImportExcel='api/price/add'
+                    apiImportExcel='api/product_lot/add'
                 />
             }
         </>
