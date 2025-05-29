@@ -138,7 +138,7 @@ export const schema = {
     },
     "Đơn vị tính": {
         prop: 'quantityunitid',
-        type: Number,
+        type: String,
         required: true
     },
     "Nhà sản xuất": {

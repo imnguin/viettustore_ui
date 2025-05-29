@@ -303,7 +303,7 @@ const Search = () => {
                                     />
                                 </Form.Item>
                                 <Form.Item style={{ marginBottom: 5 }}>
-                                    <Button type="primary" htmlType="submit">Tìm kiếm</Button>
+                                    <Button type="primary" htmlType="submit">Thêm</Button>
                                 </Form.Item>
                             </Form>
                         </Row>
