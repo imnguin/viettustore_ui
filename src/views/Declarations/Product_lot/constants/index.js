@@ -76,7 +76,7 @@ export const ElementList = [
 export const fileTempalteData = {
     data: [
         ['Mã sản phẩm', 'Barcode', 'Kích hoạt', 'Hệ thống'],
-        ['1012835000561', 50000, true, false],
+        ['1012835000561', 'aaaaaa', true, false],
     ],
 };
 
@@ -87,7 +87,7 @@ export const schema = {
         required: true
     },
     "Barcode": {
-        prop: 'price',
+        prop: 'barcode',
         type: String,
         required: true
     },
