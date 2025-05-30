@@ -68,6 +68,25 @@ const Search = () => {
     const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
     const totalPriceBeforeDiscount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const totalPrice = cart.reduce((sum, item) => sum + item.totalamount, 0);
+    const promotionDefault = (item) => {
+        if (item.quantity >= item.salequantity && !item.inputpromotion && item.applydatefrom != null && item.applydateto != null) {
+            // Ngày hiện tại ở Việt Nam (30/05/2025)
+            const currentDate = new Date();
+            currentDate.setHours(0, 0, 0, 0); // Chuẩn hóa để bỏ qua giờ
+
+            // Giả sử ngày bắt đầu và ngày kết thúc
+            const startDate = new Date(item.applydatefrom); // Ví dụ: 01/05/2025
+            startDate.setHours(0, 0, 0, 0);
+            const endDate = new Date(item.applydateto);   // Ví dụ: 15/06/2025
+            endDate.setHours(0, 0, 0, 0);
+
+            // So sánh
+            if (currentDate >= startDate && currentDate <= endDate) {
+                return parseFloat(item.promotionquantity) * Math.floor(parseFloat(item.quantity) / (item.salequantity)) * parseFloat(item.price); // Tính theo số lượng khuyến mãi
+            }
+        }
+        return 0;
+    }
 
     // Hàm loadData chung cho cả quét barcode và submit form
     const loadData = async (postData) => {
@@ -86,27 +105,19 @@ const Search = () => {
                     const updatedCart = [...prev];
                     let itemUpdate = {
                         ...response.resultObject,
-                        promotion: updatedCart[index].promotion,
                         quantity: updatedCart[index].quantity + 1,
                         inputpromotion: updatedCart[index].inputpromotion,
                     };
 
-                    if (itemUpdate.quantity >= itemUpdate.salequantity && !itemUpdate.inputpromotion) {
-                        itemUpdate.promotion = parseFloat(itemUpdate.promotionquantity) * Math.floor(parseFloat(itemUpdate.quantity) / (itemUpdate.salequantity)) * parseFloat(itemUpdate.price); // Tính theo số lượng khuyến mãi
-                        console.log(itemUpdate.promotion)
-                    }
-
+                    itemUpdate.promotion = promotionDefault(itemUpdate);
                     itemUpdate.totalamount = discountValue(itemUpdate);
                     updatedCart[index] = itemUpdate;
                     return updatedCart;
                 }
 
-                if (1 > response.resultObject.salequantity) {
-                    promotionValue = response.resultObject.promotionquantity * Math.floor(response.resultObject.quantity / response.resultObject.salequantity) * response.resultObject.price; // Tính theo số lượng khuyến mãi
-                }
-
                 let itemUpdate = { ...response.resultObject, quantity: 1, promotion: promotionValue, inputpromotion: false };
                 itemUpdate.totalamount = discountValue(itemUpdate);
+                itemUpdate.promotion = promotionDefault(itemUpdate);
                 return [...prev, itemUpdate];
             });
         } else {
@@ -221,9 +232,7 @@ const Search = () => {
             const data = cart.map((item, index) => {
                 if (item.productid === productid) {
                     item.quantity = value;
-                    if (item.quantity > item.salequantity && !item.inputpromotion) {
-                        item.promotion = parseFloat(item.promotionquantity) * Math.floor(parseFloat(item.quantity) / (item.salequantity)) * parseFloat(item.price); // Tính theo số lượng khuyến mãi
-                    }
+                    item.promotion = promotionDefault(item);
                     item.totalamount = discountValue(item);
                 }
                 return item;
@@ -261,15 +270,15 @@ const Search = () => {
         console.log('postData', postData)
         // Thêm logic thanh toán nếu cần
 
-        // const response = await dispatch(_fetchData(HOSTNAME, 'api/outputvoucher/add', postData));
-        // Notification('Thông báo', response.message, response.iserror ? 'error' : 'success');
-        // setLoading(false);
-        // if (!response.iserror) {
-        //     setCart([]);
-        //     setDiscountCode('');
-        //     setPaymentMethod('1');
-        //     return
-        // }
+        const response = await dispatch(_fetchData(HOSTNAME, 'api/outputvoucher/add', postData));
+        Notification('Thông báo', response.message, response.iserror ? 'error' : 'success');
+        setLoading(false);
+        if (!response.iserror) {
+            setCart([]);
+            setDiscountCode('');
+            setPaymentMethod('1');
+            return
+        }
     };
 
     // Thêm sản phẩm qua modal
