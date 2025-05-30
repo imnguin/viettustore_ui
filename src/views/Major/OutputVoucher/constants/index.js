@@ -223,11 +223,11 @@ export const outputvoucherDetailColumns = [
     },
     {
         title: 'Giảm giá',
-        dataIndex: 'discountamount',
-        key: 'discountamount',
+        dataIndex: 'promotion',
+        key: 'promotion',
         align: 'center',
         width: 100,
-        render: (discountamount) => discountamount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
+        render: (promotion) => promotion.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
     },
     {
         title: 'Thành tiền',

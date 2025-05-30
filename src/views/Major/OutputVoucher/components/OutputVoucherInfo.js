@@ -62,7 +62,7 @@ const OutputVoucherInfo = (props) => {
                     }}
                 >
                     <Typography.Text strong>Giảm giá: </Typography.Text>
-                    <Typography.Text>{dataSource?.discountamount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Typography.Text>
+                    <Typography.Text>{dataSource?.promotion.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Typography.Text>
                 </Col>
 
                 {/* Hàng mới, nhưng vẫn giữ xl=6 để nó canh trái đúng như cột đầu tiên */}
