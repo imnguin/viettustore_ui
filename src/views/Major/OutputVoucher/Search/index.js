@@ -201,7 +201,7 @@ const Search = () => {
             if (!!productid) {
                 const data = cart.map((item, index) => {
                     if (item.productid === productid) {
-                        item.inputpromotion = true; // Đánh dấu đã nhập giảm giá
+                        item.inputpromotion = (!value || value == 0) ? false : true; // Đánh dấu đã nhập giảm giá
                         item.promotion = value;
                         item.totalamount = discountValue(item);
                     }
