@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setBreadcrumb } from '../../../../components/Redux/Reducers';
-import { ElementList, PagePath, SearchElement, columns } from '../constants';
+import { ElementList, PagePath, SearchElement, columns, fileTempalteData, schema } from '../constants';
 import DataGird from '../../../../components/DataGird';
 import { _fetchData } from '../../../../utils/CallAPI';
 import { HOSTNAME } from '../../../../utils/constants/systemVars';
@@ -23,7 +23,7 @@ const Search = (props) => {
 
     const loadData = async (postData) => {
         setisLoadComplete(false);
-        const response = await dispatch(_fetchData(HOSTNAME, 'api/area/search', postData));
+        const response = await dispatch(_fetchData(HOSTNAME, 'api/promotion/search', postData));
         if (!response.iserror) {
             console.log(response?.resultObject);
             setData(response?.resultObject);
@@ -38,10 +38,7 @@ const Search = (props) => {
         let postData = {
             $or: [
                 {
-                    areaid: MLObject.keyword
-                },
-                {
-                    areaname: MLObject.keyword
+                    productid: MLObject.keyword
                 }
             ]
         }
@@ -54,8 +51,8 @@ const Search = (props) => {
             {
                 isLoadComplete &&
                 <DataGird
-                    pKey='areaid'
-                    title='Danh sách sách khu vực'
+                    pKey='productid'
+                    title='Danh sách khuyến mãi'
                     listColumn={columns}
                     dataSource={data}
                     defaultCurrentPage={1}
@@ -69,14 +66,19 @@ const Search = (props) => {
                     isShowHeaderAction={true}
                     isShowButtonAdd={true}
                     isShowModalBtn={true}
-                    TitleModal="khu vực"
+                    TitleModal="khuyến mãi"
                     listColumnModal={ElementList}
                     onSubmitModel={(values, action) => onSubmit({})}
                     hostName={HOSTNAME}
-                    apiAdd='api/area/add'
-                    apiUpdate='api/area/update'
-                    apiDelete='api/area/delete'
+                    apiAdd='api/promotion/add'
+                    apiUpdate='api/promotion/update'
+                    apiDelete='api/promotion/delete'
                     onSelectRowItem={(values) => onSubmit({})}
+                    isExportTemplate={true}
+                    fileTempalteData={fileTempalteData}
+                    isImportExcel={true}
+                    schema={schema}
+                    apiImportExcel='api/promotion/add'
                 />
             }
         </>

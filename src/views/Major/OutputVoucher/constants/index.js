@@ -4,6 +4,7 @@ import { DeleteOutlined, PlusOutlined, CloseOutlined } from '@ant-design/icons';
 import { Link } from "react-router-dom";
 import { render } from "@testing-library/react";
 import dayjs from "dayjs";
+import { formatDate } from "../../../../utils";
 const now = new Date();
 
 // Tạo fromDate là ngày 1 đầu tháng (giờ 00:00:00)
@@ -31,13 +32,6 @@ export const addProductColunms = [
 
 export const columns = (handleQuantityChange, handleRemoveItem, handleApplyDiscount) => {
     return [
-        {
-            title: 'STT',
-            dataIndex: 'index',
-            key: 'index',
-            align: 'center',
-            render: (_, __, index) => index + 1,
-        },
         {
             title: 'Sản phẩm',
             dataIndex: 'productid',
@@ -82,25 +76,30 @@ export const columns = (handleQuantityChange, handleRemoveItem, handleApplyDisco
             ),
         },
         {
-            title: 'Giảm giá',
-            dataIndex: 'discount',
-            key: 'discount',
+            title: 'Thành tiền',
+            key: 'totalprice',
             align: 'center',
-            render: (discount, record) => (
+            render: (_, record) => (record.quantity * record.price).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
+        },
+        {
+            title: 'Giảm giá',
+            dataIndex: 'promotion',
+            key: 'promotion',
+            align: 'center',
+            render: (promotion, record) => (
                 <Input
-                    value={discount}
+                    value={promotion}
                     onChange={(e) => handleApplyDiscount(record.productid, e.target.value)}
                     style={{ width: '80px' }}
                 />
             ),
         },
         {
-            title: 'Thành tiền',
-            key: 'total',
+            title: 'Khách phải trả',
+            dataIndex: 'totalamount',
+            key: 'totalamount',
             align: 'center',
-            render: (_, record) => {
-                return record.total.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
-            },
+            render: (_, record) => (record.totalamount).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
         },
         {
             title: '',
@@ -109,6 +108,7 @@ export const columns = (handleQuantityChange, handleRemoveItem, handleApplyDisco
             render: (_, record) => (
                 <Button type="link" danger onClick={() => handleRemoveItem(record.productid)} icon={<DeleteOutlined />} />
             ),
+            width: 40,
         },
     ]
 }
@@ -132,49 +132,6 @@ export const SearchElement = [
         name: 'todate',
         defaultValue: toDate
     },
-    // {
-    //     type: 'SelectBox',
-    //     label: 'Thanh toán',
-    //     name: 'paymentmethod',
-    //     listOption: [
-    //         {
-    //             label: 'Tiền mặt',
-    //             value: '1'
-    //         },
-    //         {
-    //             label: 'Chuyển khoản',
-    //             value: '2'
-    //         }
-    //     ],
-    //     maxTagCount: 'responsive',
-    // },
-    // {
-    //     type: 'SelectBox',
-    //     label: 'Giảm giá',
-    //     name: 'discounttype',
-    //     listOption: [
-    //         {
-    //             label: 'Theo tiền',
-    //             value: '1'
-    //         },
-    //         {
-    //             label: 'Theo phần trăm',
-    //             value: '2'
-    //         }
-    //     ],
-    //     maxTagCount: 'responsive',
-    // },
-    // {
-    //     type: 'SelectBox',
-    //     label: 'Đơn vị tính',
-    //     name: 'quantityunitid',
-    //     listOption: [],
-    //     maxTagCount: 'responsive',
-    //     isLoadData: true,
-    //     url: 'api/quantityunit/getCache',
-    //     elementValue: 'quantityunitid',
-    //     elementName: 'quantityunitname'
-    // },
 ];
 
 export const InitParam = {
@@ -218,15 +175,7 @@ export const historyColumns = [
         title: 'Ngày lập hóa đơn',
         dataIndex: 'createdat',
         key: 'createdat',
-        render: (createdat) => {
-            return new Date(createdat).toLocaleDateString('vi-VN', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-            });
-        },
+        render: (text) => (formatDate(text)),
         width: 100,
         align: 'center'
     }

@@ -1,4 +1,4 @@
-import { Button, Checkbox, Col, Divider, Form, Grid, Row, Space } from "antd";
+import { Button, Checkbox, Col, DatePicker, Divider, Form, Grid, Row, Space } from "antd";
 import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
@@ -7,6 +7,7 @@ import TextBox from '../FormCotrol/TextBox';
 import SelectBox from "../FormCotrol/SelectBox";
 import TextArea from "../FormCotrol/TextArea";
 import StyleDefault from "../FormCotrol/StyleDefault";
+import dayjs from "dayjs";
 const { useBreakpoint } = Grid;
 
 const FormContainer = (props) => {
@@ -71,6 +72,18 @@ const FormContainer = (props) => {
                     return <Col xs={24} sm={!!elm.span ? elm.span : 12} key={index}>
                         <Form.Item name={elm.name} valuePropName="checked" initialValue={value !== undefined ? value : elm.value}>
                             <Checkbox>{elm.label}</Checkbox>
+                        </Form.Item>
+                    </Col>
+                case 'datepicker':
+                    return <Col xs={24} sm={!!elm.span ? elm.span : 12} key={index}>
+                        <Form.Item name={elm.name} label={elm.label} rules={elm.rules} initialValue={dayjs(elm.defaultValue).isValid() ? dayjs(elm.defaultValue) : dayjs(new Date())}>
+                            <DatePicker
+                                placement={!!elm.placement ? elm.placement : 'topLeft'}
+                                showTime={!!elm.showTime ? elm.showTime : false}
+                                disabled={!!elm.disabled ? elm.disabled : false}
+                                format={elm.format ? elm.format : 'DD/MM/YYYY'}
+                                style={{ width: '100%' }}
+                            />
                         </Form.Item>
                     </Col>
                 default: return ""

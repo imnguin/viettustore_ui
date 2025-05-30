@@ -65,6 +65,12 @@ const AppMenu = [
                 path: '/Barcode',
                 subItem: []
             },
+            {
+                name: 'Promotion',
+                label: 'Khuyến mãi',
+                path: '/Promotion',
+                subItem: []
+            },
         ]
     },
     {

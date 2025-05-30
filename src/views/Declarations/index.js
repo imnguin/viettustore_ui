@@ -7,7 +7,9 @@ import Branch from "./Branch";
 import Area from "./Area";
 import Price from "./Price";
 import Product_lot from "./Product_lot";
+import Promotion from "./Promotion";
 export const routes = [
+    ...Promotion,
     ...Product_lot,
     ...Price,
     ...Area,

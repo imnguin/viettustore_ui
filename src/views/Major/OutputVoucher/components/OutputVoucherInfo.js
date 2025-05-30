@@ -1,5 +1,6 @@
 import React from 'react';
 import { Col, Row, Typography } from 'antd';
+import { formatDate } from '../../../../utils';
 
 const OutputVoucherInfo = (props) => {
     let {
@@ -36,14 +37,7 @@ const OutputVoucherInfo = (props) => {
                     }}>
                     <Typography.Text strong>Ngày tạo: </Typography.Text>
                     <Typography.Text>
-                        {
-                            new Date(dataSource?.createdat).toLocaleDateString('vi-VN', {
-                                year: 'numeric',
-                                month: '2-digit',
-                                day: '2-digit',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                            })}
+                        {formatDate(dataSource?.createdat)}
                     </Typography.Text>
                 </Col>
                 <Col

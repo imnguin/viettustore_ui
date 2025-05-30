@@ -55,7 +55,7 @@ const Search = (props) => {
                 isLoadComplete &&
                 <DataGird
                     pKey='productid'
-                    title='Danh giá sản phẩm'
+                    title='Danh sách giá sản phẩm'
                     listColumn={columns}
                     dataSource={data}
                     defaultCurrentPage={1}

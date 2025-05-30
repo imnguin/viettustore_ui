@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { formatDate } from "../../../../utils";
 
 export const PagePath = [{ href: "/", title: "Trang chủ" }, { title: "Danh sách sản phẩm", }];
 export const AddPagePath = [{ href: "/", title: "Trang chủ" }, { href: "/User", title: "Danh sách sản phẩm", }, { title: "Thêm mới", }];
@@ -28,6 +29,7 @@ export const columns = [
         dataIndex: 'createdat',
         key: 'createdat',
         width: 30,
+        render: (text) => (formatDate(text))
     },
     {
         title: 'Tác vụ',

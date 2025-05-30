@@ -67,7 +67,7 @@ const Search = () => {
     // Tính tổng số lượng và tổng tiền
     const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
     const totalPriceBeforeDiscount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const totalPrice = cart.reduce((sum, item) => sum + item.total, 0);
+    const totalPrice = cart.reduce((sum, item) => sum + item.totalamount, 0);
 
     // Hàm loadData chung cho cả quét barcode và submit form
     const loadData = async (postData) => {
@@ -80,21 +80,33 @@ const Search = () => {
                 return;
             }
             setCart((prev) => {
+                let promotionValue = 0;
                 const index = prev.findIndex((item) => item.productid === response.resultObject.productid);
                 if (index !== -1) {
                     const updatedCart = [...prev];
                     let itemUpdate = {
                         ...response.resultObject,
-                        discount: updatedCart[index].discount,
-                        quantity: updatedCart[index].quantity + 1
+                        promotion: updatedCart[index].promotion,
+                        quantity: updatedCart[index].quantity + 1,
+                        inputpromotion: updatedCart[index].inputpromotion,
                     };
-                    itemUpdate.total = discountValue(itemUpdate);
+
+                    if (itemUpdate.quantity >= itemUpdate.salequantity && !itemUpdate.inputpromotion) {
+                        itemUpdate.promotion = parseFloat(itemUpdate.promotionquantity) * Math.floor(parseFloat(itemUpdate.quantity) / (itemUpdate.salequantity)) * parseFloat(itemUpdate.price); // Tính theo số lượng khuyến mãi
+                        console.log(itemUpdate.promotion)
+                    }
+
+                    itemUpdate.totalamount = discountValue(itemUpdate);
                     updatedCart[index] = itemUpdate;
                     return updatedCart;
                 }
 
-                let itemUpdate = { ...response.resultObject, quantity: 1, discount: 0 };
-                itemUpdate.total = discountValue(itemUpdate);
+                if (1 > response.resultObject.salequantity) {
+                    promotionValue = response.resultObject.promotionquantity * Math.floor(response.resultObject.quantity / response.resultObject.salequantity) * response.resultObject.price; // Tính theo số lượng khuyến mãi
+                }
+
+                let itemUpdate = { ...response.resultObject, quantity: 1, promotion: promotionValue, inputpromotion: false };
+                itemUpdate.totalamount = discountValue(itemUpdate);
                 return [...prev, itemUpdate];
             });
         } else {
@@ -160,16 +172,16 @@ const Search = () => {
     };
 
     const discountValue = (record) => {
-        let total = record.price * record.quantity;
-        if (typeof record.discount === 'string' && record.discount.endsWith('%')) {
-            const percent = getNumberFromPercent(record.discount);
+        let totalamount = record.price * record.quantity;
+        if (typeof record.promotion === 'string' && record.promotion.endsWith('%')) {
+            const percent = getNumberFromPercent(record.promotion);
             if (percent !== null) {
-                total = total - (percent / 100) * total; // Giảm theo phần trăm
+                totalamount = totalamount - (percent / 100) * totalamount; // Giảm theo phần trăm
             }
-        } else if (!isNaN(Number(record.discount))) {
-            total = total - Number(record.discount); // Giảm theo số tiền cố định
+        } else if (!isNaN(Number(record.promotion))) {
+            totalamount = totalamount - Number(record.promotion); // Giảm theo số tiền cố định
         }
-        return total;
+        return totalamount;
     }
 
     const handleApplyDiscount = (productid, value) => {
@@ -178,8 +190,9 @@ const Search = () => {
             if (!!productid) {
                 const data = cart.map((item, index) => {
                     if (item.productid === productid) {
-                        item.discount = value;
-                        item.total = discountValue(item);
+                        item.inputpromotion = true; // Đánh dấu đã nhập giảm giá
+                        item.promotion = value;
+                        item.totalamount = discountValue(item);
                     }
                     return item;
                 })
@@ -187,8 +200,8 @@ const Search = () => {
                 return
             }
             const data = cart.map((item, index) => {
-                item.discount = value;
-                item.total = discountValue(item);
+                item.promotion = value;
+                item.totalamount = discountValue(item);
                 return item;
             })
             setCart(data);
@@ -208,7 +221,10 @@ const Search = () => {
             const data = cart.map((item, index) => {
                 if (item.productid === productid) {
                     item.quantity = value;
-                    item.total = discountValue(item);
+                    if (item.quantity > item.salequantity && !item.inputpromotion) {
+                        item.promotion = parseFloat(item.promotionquantity) * Math.floor(parseFloat(item.quantity) / (item.salequantity)) * parseFloat(item.price); // Tính theo số lượng khuyến mãi
+                    }
+                    item.totalamount = discountValue(item);
                 }
                 return item;
             })
@@ -236,24 +252,24 @@ const Search = () => {
                 barcode: item.barcode,
                 price: item.price,
                 quantity: item.quantity,
-                totalamount: item.total,
+                totalamount: item.totalamount,
                 paymentmethod: paymentMethod,
-                discountamount: (item.price * item.quantity) - item.total,
-                discounttype: !getNumberFromPercent(item.discount) ? '1' : '2', //1: tiền ; 2: phần trắm
+                promotion: (item.price * item.quantity) - item.totalamount,
+                discounttype: !getNumberFromPercent(item.promotion) ? '1' : '2', //1: tiền ; 2: phần trắm
             }
         })
         console.log('postData', postData)
         // Thêm logic thanh toán nếu cần
 
-        const response = await dispatch(_fetchData(HOSTNAME, 'api/outputvoucher/add', postData));
-        Notification('Thông báo', response.message, response.iserror ? 'error' : 'success');
-        setLoading(false);
-        if (!response.iserror) {
-            setCart([]);
-            setDiscountCode('');
-            setPaymentMethod('1');
-            return
-        }
+        // const response = await dispatch(_fetchData(HOSTNAME, 'api/outputvoucher/add', postData));
+        // Notification('Thông báo', response.message, response.iserror ? 'error' : 'success');
+        // setLoading(false);
+        // if (!response.iserror) {
+        //     setCart([]);
+        //     setDiscountCode('');
+        //     setPaymentMethod('1');
+        //     return
+        // }
     };
 
     // Thêm sản phẩm qua modal
@@ -279,7 +295,7 @@ const Search = () => {
     return (
         <>
             <Row gutter={[16, 16]}>
-                <Col xs={24} lg={14} xl={16} xxl={18}>
+                <Col xs={24} lg={16} xl={18} xxl={20}>
                     <Card
                         title="Danh sách sản phẩm (click vào vùng trống khi quét mã)"
                         style={{ borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
@@ -319,7 +335,7 @@ const Search = () => {
                     </Card>
                 </Col>
 
-                <Col xs={24} lg={10} xl={8} xxl={6}>
+                <Col xs={24} lg={10} xl={6} xxl={4}>
                     <Card
                         title="Thông Tin Thanh Toán"
                         style={{ borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
@@ -339,7 +355,7 @@ const Search = () => {
                                             </Col>
                                             <Col xs={10} sm={10}>
                                                 <Button type="primary" onClick={() => handleApplyDiscount(null, discountCode)} block style={{ width: '100%' }}>
-                                                    Áp dụng tất cả
+                                                    Áp dụng
                                                 </Button>
                                             </Col>
                                         </Row>
@@ -359,13 +375,13 @@ const Search = () => {
                                 </Col>
                             </Row>
                             <div style={{ marginTop: '24px' }}>
-                                <Text strong>Tổng tiền hàng {`(${totalQuantity} sản phẩm)`}: </Text>
+                                <Text strong>Tổng {`(${totalQuantity} sản phẩm)`}: </Text>
                                 <Text>{totalPriceBeforeDiscount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Text>
                                 <br />
-                                <Text strong>Giảm Giá: </Text>
+                                <Text strong>Giảm: </Text>
                                 <Text type="success">{(totalPriceBeforeDiscount - totalPrice).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Text>
                                 <br />
-                                <Text strong>Khách phải trả: </Text>
+                                <Text strong>KH phải trả: </Text>
                                 <Text type="danger" style={{ fontSize: '18px' }}>
                                     {totalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                                 </Text>

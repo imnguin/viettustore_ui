@@ -48,7 +48,7 @@ const Search = (props) => {
                 isLoadComplete &&
                 <DataGird
                     pKey='productid'
-                    title='Danh barcode'
+                    title='Danh sách barcode'
                     listColumn={columns}
                     dataSource={data}
                     defaultCurrentPage={1}
